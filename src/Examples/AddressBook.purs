@@ -60,7 +60,7 @@ findEntry firstName lastName = head <<< filter filterEntry
   where
   filterEntry entry = entry.firstName == firstName && entry.lastName == lastName
 
--- <<< 左 compose
+-- <<< 左 compose，等同 haskell 的 .
 -- >>> 右 compose
 -- 基本上用 $ 就行
 

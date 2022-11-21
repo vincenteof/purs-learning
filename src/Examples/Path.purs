@@ -5,6 +5,7 @@ module Examples.Path
   , filename
   , isDirectory
   , largestSmallest
+  , largestSmallest'
   , ls
   , onlyFiles
   , root
@@ -113,3 +114,17 @@ largestSmallest path = foldl iter [] (onlyFiles path)
     _ -> []
   iter _ _ = []
 
+-- 这个是 github 上的版本
+-- 因为 Maybe 实现了 Ord 的 typeclass，具体实现是直接按照 Maybe 内部的类型做 Ord
+largestSmallest' :: Path -> Array Path
+largestSmallest' path = foldl loop [] (onlyFiles path)
+  where
+  loop :: Array Path -> Path -> Array Path
+  loop [ largest, smallest ] current
+    | size current < size smallest = [ largest, current ]
+    | size current > size largest = [ current, smallest ]
+    | otherwise = [ largest, smallest ]
+  loop [ last ] current
+    | size current < size last = [ current, last ]
+    | otherwise = [ last, current ]
+  loop arr current = current : arr

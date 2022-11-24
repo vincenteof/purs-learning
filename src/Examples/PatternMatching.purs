@@ -8,6 +8,7 @@ module Examples.PatternMatching
   , gcd
   , isEmpty
   , livesInLA
+  , lzs
   , pascal
   , sameCity
   , showPerson
@@ -19,6 +20,10 @@ module Examples.PatternMatching
   ) where
 
 import Prelude
+
+import Data.Array (tail)
+import Data.Foldable (sum)
+import Data.Maybe (fromMaybe)
 
 gcd :: Int -> Int -> Int
 gcd n 0 = n
@@ -119,3 +124,10 @@ sortPair arr = arr
 fromSingleton :: forall a. a -> Array a -> a
 fromSingleton _ [ x ] = x
 fromSingleton default _ = default
+
+-- 最长的和为 0 的后缀
+lzs :: Array Int -> Array Int
+lzs [] = []
+lzs xs = case sum xs of
+  0 -> xs
+  _ -> lzs (fromMaybe [] $ tail xs)

@@ -1,14 +1,23 @@
 module Examples.PatternMatching
   ( Address
+  , Amp(..)
+  , Ohm(..)
   , Person
+  , Volt(..)
+  , Watt(..)
   , binomial
+  , calculateCurrent
+  , calculateWattage
+  , current
   , factorial
   , fromSingleton
   , fromString
   , gcd
+  , gcdV2
   , isEmpty
   , livesInLA
   , lzs
+  , partialFunction
   , pascal
   , sameCity
   , showPerson
@@ -19,11 +28,15 @@ module Examples.PatternMatching
   , unknownPerson
   ) where
 
-import Prelude
+import Prelude hiding (gcd)
+import Partial.Unsafe (unsafePartial)
 
 import Data.Array (tail)
 import Data.Foldable (sum)
 import Data.Maybe (fromMaybe)
+
+partialFunction :: Boolean -> Boolean
+partialFunction = unsafePartial \true -> true
 
 gcd :: Int -> Int -> Int
 gcd n 0 = n
@@ -131,3 +144,34 @@ lzs [] = []
 lzs xs = case sum xs of
   0 -> xs
   _ -> lzs (fromMaybe [] $ tail xs)
+
+-- newtype 可以构造一种特殊的 ADT，只有一个 constructor 并且只接受一个参数
+newtype Volt = Volt Number
+newtype Ohm = Ohm Number
+newtype Amp = Amp Number
+
+derive newtype instance eqAmp :: Eq Amp
+derive newtype instance showAmp :: Show Amp
+
+calculateCurrent :: Volt -> Ohm -> Amp
+calculateCurrent (Volt v) (Ohm r) = Amp (v / r)
+
+battery :: Volt
+battery = Volt 1.5
+
+lightbulb :: Ohm
+lightbulb = Ohm 500.0
+
+current :: Amp
+current = calculateCurrent battery lightbulb
+
+-- 这个类型的意义在于，比如上面的公式的参数其实是不同单位的，如果是同一个单位的参数会发生 compilation error
+-- 如果设计成 number 类型的话就丧失了这种语意
+
+newtype Coulomb = MakeCoulomb Number
+-- 一般来说 type constructor 和 data constructor 都是同名的，但是不一样也是允许的，不过一般不这样
+
+newtype Watt = Watt Number
+
+calculateWattage :: Amp -> Volt -> Watt
+calculateWattage (Amp a) (Volt v) = Watt (a * v)
